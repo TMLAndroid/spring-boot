@@ -265,9 +265,14 @@ public class SpringApplication {
 		this.resourceLoader = resourceLoader;
 		Assert.notNull(primarySources, "PrimarySources must not be null");
 		this.primarySources = new LinkedHashSet<>(Arrays.asList(primarySources));
+		// 推断什么类型
 		this.webApplicationType = WebApplicationType.deduceFromClasspath();
+		// getSpringFactoriesInstances 根据spring.factors 获取6个
+		// ApplicationContextInitializer的实现类
 		setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class));
+		// 同上
 		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));
+		// 推断主类 根据堆栈找到
 		this.mainApplicationClass = deduceMainApplicationClass();
 	}
 
@@ -298,6 +303,7 @@ public class SpringApplication {
 		ConfigurableApplicationContext context = null;
 		Collection<SpringBootExceptionReporter> exceptionReporters = new ArrayList<>();
 		configureHeadlessProperty();
+		// 根据springfactores 找到一个
 		SpringApplicationRunListeners listeners = getRunListeners(args);
 		listeners.starting();
 		try {
