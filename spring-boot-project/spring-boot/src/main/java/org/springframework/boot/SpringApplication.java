@@ -278,6 +278,7 @@ public class SpringApplication {
 
 	private Class<?> deduceMainApplicationClass() {
 		try {
+			//拿到方法调用栈
 			StackTraceElement[] stackTrace = new RuntimeException().getStackTrace();
 			for (StackTraceElement stackTraceElement : stackTrace) {
 				if ("main".equals(stackTraceElement.getMethodName())) {
@@ -298,23 +299,33 @@ public class SpringApplication {
 	 * @return a running {@link ApplicationContext}
 	 */
 	public ConfigurableApplicationContext run(String... args) {
+		//计时器
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
 		ConfigurableApplicationContext context = null;
 		Collection<SpringBootExceptionReporter> exceptionReporters = new ArrayList<>();
+		//初始化图形化界面的组件
 		configureHeadlessProperty();
 		// 根据springfactores 找到一个
 		SpringApplicationRunListeners listeners = getRunListeners(args);
+		//回调监听器starting方法了
 		listeners.starting();
 		try {
+			//命令行参数 构造成一个对象
 			ApplicationArguments applicationArguments = new DefaultApplicationArguments(args);
+			//构造一个环境配置
 			ConfigurableEnvironment environment = prepareEnvironment(listeners, applicationArguments);
+			//配置需要忽略的bean
 			configureIgnoreBeanInfo(environment);
+			//初始化Banner图并打印
 			Banner printedBanner = printBanner(environment);
+			//根据是java还是web项目 创建ApplicationContext对象
 			context = createApplicationContext();
+			//初始化异常打印信息
 			exceptionReporters = getSpringFactoriesInstances(SpringBootExceptionReporter.class,
 					new Class[] { ConfigurableApplicationContext.class }, context);
 			prepareContext(context, environment, listeners, applicationArguments, printedBanner);
+			//context的初始化，spring Boot主要重写了onRefresh 并且判断是否需要启动内嵌的Tomcat
 			refreshContext(context);
 			afterRefresh(context, applicationArguments);
 			stopWatch.stop();
@@ -330,6 +341,7 @@ public class SpringApplication {
 		}
 
 		try {
+			//回调running方法 启动成功了....
 			listeners.running(context);
 		}
 		catch (Throwable ex) {
@@ -345,12 +357,14 @@ public class SpringApplication {
 		ConfigurableEnvironment environment = getOrCreateEnvironment();
 		configureEnvironment(environment, applicationArguments.getSourceArgs());
 		ConfigurationPropertySources.attach(environment);
+		//会专门有一个监听器去监听spring boot 环境构建 并且去读取application.yml配置文件
 		listeners.environmentPrepared(environment);
 		bindToSpringApplication(environment);
 		if (!this.isCustomEnvironment) {
 			environment = new EnvironmentConverter(getClassLoader()).convertEnvironmentIfNecessary(environment,
 					deduceEnvironmentClass());
 		}
+		//ConfigurationPropertySources里面配置文件进行合并
 		ConfigurationPropertySources.attach(environment);
 		return environment;
 	}
@@ -369,8 +383,11 @@ public class SpringApplication {
 	private void prepareContext(ConfigurableApplicationContext context, ConfigurableEnvironment environment,
 			SpringApplicationRunListeners listeners, ApplicationArguments applicationArguments, Banner printedBanner) {
 		context.setEnvironment(environment);
+		//对context进行后置处理 注入Bean组件
 		postProcessApplicationContext(context);
+		//回调ApplicationInitialize的initialize方法
 		applyInitializers(context);
+		//回调contextPrepared方法
 		listeners.contextPrepared(context);
 		if (this.logStartupInfo) {
 			logStartupInfo(context.getParent() == null);
@@ -412,6 +429,7 @@ public class SpringApplication {
 
 	private SpringApplicationRunListeners getRunListeners(String[] args) {
 		Class<?>[] types = new Class<?>[] { SpringApplication.class, String[].class };
+		//从配置文件里读取 SpringApplicationRunListener实现
 		return new SpringApplicationRunListeners(logger,
 				getSpringFactoriesInstances(SpringApplicationRunListener.class, types, this, args));
 	}
@@ -760,6 +778,8 @@ public class SpringApplication {
 
 	private void callRunners(ApplicationContext context, ApplicationArguments args) {
 		List<Object> runners = new ArrayList<>();
+		//这里从Bean工厂拿
+		//之前都是从配置文件拿 因为之前还没有初始化spring容器
 		runners.addAll(context.getBeansOfType(ApplicationRunner.class).values());
 		runners.addAll(context.getBeansOfType(CommandLineRunner.class).values());
 		AnnotationAwareOrderComparator.sort(runners);

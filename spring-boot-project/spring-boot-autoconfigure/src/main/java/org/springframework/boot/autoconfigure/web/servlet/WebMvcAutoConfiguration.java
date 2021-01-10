@@ -190,6 +190,7 @@ public class WebMvcAutoConfiguration {
 
 		private final ListableBeanFactory beanFactory;
 
+		//使用@Bean 就会自动加入
 		private final ObjectProvider<HttpMessageConverters> messageConvertersProvider;
 
 		final ResourceHandlerRegistrationCustomizer resourceHandlerRegistrationCustomizer;

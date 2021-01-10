@@ -1,0 +1,16 @@
+#yml 语法
+#  ConfigurationProperties支持松散语法 Value不支持
+#  Value支持SPL表达式 @Value("#{${1+2}}")
+
+sex: 1
+sex1: 2
+student:
+  name: 123
+  age: 111
+  email: 123@qq.com
+#student: {name: 123,age: 122}
+#users: [{name: 123,password: 122},{name: 123,password: 122}]
+#users1:
+#  - {name: 123,password: 122}
+#  - {name: 123,password: 122}
+

@@ -103,6 +103,7 @@ public class LocalDevToolsAutoConfiguration {
 			this.properties = properties;
 		}
 
+		//重启项目
 		@Override
 		public void onApplicationEvent(ClassPathChangedEvent event) {
 			if (event.isRestartRequired()) {
@@ -131,6 +132,7 @@ public class LocalDevToolsAutoConfiguration {
 			return new HateoasObjenesisCacheDisabler();
 		}
 
+
 		@Bean
 		public FileSystemWatcherFactory fileSystemWatcherFactory() {
 			return this::newFileSystemWatcher;
@@ -142,7 +144,7 @@ public class LocalDevToolsAutoConfiguration {
 		public ConditionEvaluationDeltaLoggingListener conditionEvaluationDeltaLoggingListener() {
 			return new ConditionEvaluationDeltaLoggingListener();
 		}
-
+		//文件监听器
 		private FileSystemWatcher newFileSystemWatcher() {
 			Restart restartProperties = this.properties.getRestart();
 			FileSystemWatcher watcher = new FileSystemWatcher(true, restartProperties.getPollInterval(),
@@ -182,7 +184,7 @@ public class LocalDevToolsAutoConfiguration {
 		public boolean supportsSourceType(Class<?> sourceType) {
 			return true;
 		}
-
+		//@EventListener
 		@Override
 		public void onApplicationEvent(ApplicationEvent event) {
 			if (event instanceof ContextRefreshedEvent || (event instanceof ClassPathChangedEvent

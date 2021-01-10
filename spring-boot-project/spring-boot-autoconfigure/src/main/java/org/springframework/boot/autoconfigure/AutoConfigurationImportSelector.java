@@ -115,10 +115,13 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 		AnnotationAttributes attributes = getAttributes(annotationMetadata);
 		// 从META-INF/spring.factories文件中获取EnableAutoConfiguration所对应的configuration
 		List<String> configurations = getCandidateConfigurations(annotationMetadata, attributes);
+		//去重
 		configurations = removeDuplicates(configurations);
+		//剔除 exclude
 		Set<String> exclusions = getExclusions(annotationMetadata, attributes);
 		checkExcludedClasses(configurations, exclusions);
 		configurations.removeAll(exclusions);
+		//@ConditionalOnXXX@ConditionalOnClass 判断当前容器有没有该Class 如果有就注入该类，如果没有就不注入
 		configurations = filter(configurations, autoConfigurationMetadata);
 		fireAutoConfigurationImportEvents(configurations, exclusions);
 		return new AutoConfigurationEntry(configurations, exclusions);

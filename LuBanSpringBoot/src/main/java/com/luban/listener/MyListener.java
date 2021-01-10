@@ -1,4 +1,4 @@
-package com.luban;
+package com.luban.listener;
 
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.event.GenericApplicationListener;
